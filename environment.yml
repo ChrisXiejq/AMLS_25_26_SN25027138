@@ -1,0 +1,21 @@
+name: amls-final
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.10
+  - numpy
+  - scikit-learn
+  - matplotlib
+  - pillow
+  - tqdm
+  - pip
+  - pip:
+      - torch
+      - torchvision
+      - torchaudio
+      - medmnist
+      - seaborn
+      - pandas
