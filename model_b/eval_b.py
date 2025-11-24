@@ -2,7 +2,17 @@ import torch
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import numpy as np
 from .plot_b import plot_confusion_matrix
+from .train_b import train_model_b
 
+def run_model_b_experiments():
+    print("\n========= Running Model B (CNN) =========\n")
+    results = train_model_b(
+        batch_size=64,
+        lr=1e-3,
+        epochs=10,
+        augment=True,
+    )
+    return results
 
 def evaluate_metrics(model, test_loader, device):
     model.eval()

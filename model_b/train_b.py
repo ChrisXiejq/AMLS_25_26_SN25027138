@@ -76,7 +76,7 @@ def train_model_b(
 
         print(f"Epoch {epoch}: Train Loss={train_loss:.4f}, Val Loss={val_loss:.4f}, Val Acc={val_acc:.4f}")
 
-    # 保存曲线
+    # Plot learning curves
     plot_learning_curve(train_losses, val_losses, val_accuracies)
 
     # Test
@@ -84,7 +84,7 @@ def train_model_b(
     results = evaluate_metrics(model, test_loader, device)
     print(results)
 
-    # 保存模型
+    # Save model
     os.makedirs("outputs/model_b", exist_ok=True)
     torch.save(model.state_dict(), "outputs/model_b/cnn_model.pth")
 

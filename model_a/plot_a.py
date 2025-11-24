@@ -11,7 +11,12 @@ def ensure_dir(path):
 
 
 def plot_capacity_performance(results, save_dir):
-    """可视化：不同 C 的 Test 准确率 / F1"""
+    """
+        visualize: capacity vs performance
+        args:
+            results: dict from train_model_a
+            save_dir: directory to save plots
+    """
     ensure_dir(save_dir)
 
     Cs = list(results.keys())
@@ -33,7 +38,7 @@ def plot_capacity_performance(results, save_dir):
 
 
 def plot_conf_matrix(results, C_best, X_test, y_test, save_dir):
-    """可视化：混淆矩阵"""
+    """ visualize: confusion matrix """
     ensure_dir(save_dir)
 
     model = results[C_best]["model"]
@@ -52,7 +57,7 @@ def plot_conf_matrix(results, C_best, X_test, y_test, save_dir):
 
 
 def plot_train_budget(budget_results, save_dir):
-    """可视化：训练预算变化"""
+    """visualize: training budget vs performance"""
     ensure_dir(save_dir)
 
     ratios = []
