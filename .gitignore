@@ -1,0 +1,28 @@
+# === Python cache ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# === VSCode ===
+.vscode/
+
+# === Environment ===
+env/
+venv/
+*.env
+
+# === Project outputs ===
+outputs/
+
+# === Model checkpoints ===
+*.pth
+*.pkl
+
+# === Datasets ===
+Datasets/
+Datasets/.gitkeep
+
+# === IDE / OS junk ===
+.DS_Store
+Thumbs.db
