@@ -1,5 +1,8 @@
 import os
 import torch
+import random
+from torchvision import transforms
+import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from medmnist import BreastMNIST
@@ -13,28 +16,44 @@ def get_dataset_root():
     os.makedirs(dataset_root, exist_ok=True)
     return dataset_root
 
+class GaussianNoiseTransform:
+    def __init__(self, mean=0.0, std=0.05):
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, tensor):
+        # Only works on tensors
+        noise = torch.randn(tensor.size()) * self.std + self.mean
+        return tensor + noise
+
+
 def get_transform(augment=False):
     """
     CNN transform with optional augmentation
-    Args:
-        augment (bool): whether to apply data augmentation
-    Returns:
-        torchvision.transforms.Compose: the composed transform
     """
-    ops = []
+    pil_ops = []
+    tensor_ops = []
 
     if augment:
-        ops.extend([
+        pil_ops.extend([
             transforms.RandomHorizontalFlip(0.5),
             transforms.RandomRotation(10),
+            transforms.ColorJitter(brightness=0.1, contrast=0.1),
         ])
 
-    ops.extend([
-        transforms.ToTensor(),
+    # Tensor-only transforms
+    tensor_ops.extend([
+        GaussianNoiseTransform(std=0.03),
         transforms.Normalize(mean=[0.5], std=[0.5]),
     ])
 
-    return transforms.Compose(ops)
+    # Pipeline:
+    # PIL → PIL transforms → ToTensor → Tensor transforms
+    return transforms.Compose(
+        pil_ops
+        + [transforms.ToTensor()]
+        + tensor_ops
+    )
 
 
 def get_datasets(augment_train=True):

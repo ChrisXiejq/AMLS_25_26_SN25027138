@@ -8,28 +8,36 @@ def ensure_dir(path):
         os.makedirs(path)
 
 
-def plot_learning_curve(train_losses, val_losses, val_acc):
-    ensure_dir("outputs/model_b")
+def plot_learning_curve(train_losses, val_losses, val_accuracies, suffix=""):
+    import matplotlib.pyplot as plt
+    import os
 
-    plt.figure(figsize=(8, 5))
+    os.makedirs("outputs/model_b", exist_ok=True)
+
+    if suffix:
+        suffix = f"_{suffix}"
+
+    # Loss curve
+    plt.figure()
     plt.plot(train_losses, label="Train Loss")
     plt.plot(val_losses, label="Val Loss")
     plt.legend()
-    plt.title("CNN Learning Curve")
+    plt.title(f"Loss Curve{suffix}")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
-    plt.grid()
-    plt.savefig("outputs/model_b/learning_curve.png", dpi=300)
+    plt.savefig(f"outputs/model_b/loss_curve{suffix}.png")
     plt.close()
 
-    plt.figure(figsize=(8, 5))
-    plt.plot(val_acc, label="Val Accuracy", marker="o")
-    plt.title("Validation Accuracy Curve")
+    # Val Accuracy curve
+    plt.figure()
+    plt.plot(val_accuracies, label="Val Accuracy")
+    plt.legend()
+    plt.title(f"Accuracy Curve{suffix}")
     plt.xlabel("Epoch")
     plt.ylabel("Accuracy")
-    plt.grid()
-    plt.savefig("outputs/model_b/val_accuracy_curve.png", dpi=300)
+    plt.savefig(f"outputs/model_b/accuracy_curve{suffix}.png")
     plt.close()
+
 
 
 def plot_confusion_matrix(cm):

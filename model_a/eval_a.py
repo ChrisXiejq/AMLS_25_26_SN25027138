@@ -1,10 +1,15 @@
 from .train_a import train_model_a
-from .eval_a import report_results
 
 def run_model_a_experiments():
     print("\n========= Running Model A Experiments (SVM + PCA) =========\n")
 
-    results_raw = train_model_a(augment=False)
+    results_raw = train_model_a(
+        use_pca=False,
+        capacity_list=[0.1, 1, 10],
+        subset_ratio=0.1,  # set to 0.1 for quick tests
+        augment=False,
+        hog=False
+    )
 
     report_results(results_raw, title="Model A Results raw pixels")
 

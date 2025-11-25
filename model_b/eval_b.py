@@ -1,47 +1,25 @@
-import torch
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+import os
 import numpy as np
-from .plot_b import plot_confusion_matrix
 from .train_b import train_model_b
 
+
 def run_model_b_experiments():
-    print("\n========= Running Model B (CNN) =========\n")
-    results = train_model_b(
-        batch_size=64,
-        lr=1e-3,
-        epochs=10,
-        augment=True,
-    )
-    return results
+    os.makedirs("outputs/model_b", exist_ok=True)
 
-def evaluate_metrics(model, test_loader, device):
-    model.eval()
+    print("\n=== EXPERIMENT 1: Model Capacity ===")
+    cap_small  = train_model_b(model_size="small")
+    cap_medium = train_model_b(model_size="medium")
+    cap_large  = train_model_b(model_size="large")
 
-    y_true = []
-    y_pred = []
+    print("\n=== EXPERIMENT 2: Data Augmentation ===")
+    aug_off = train_model_b(augment=False, model_size="small")
+    aug_on  = train_model_b(augment=True,  model_size="small")
 
-    with torch.no_grad():
-        for xb, yb in test_loader:
-            xb, yb = xb.to(device), yb.to(device)
+    print("\n=== EXPERIMENT 3: Training Budget ===")
+    bud_30 = train_model_b(subset_ratio=0.3)
+    bud_100 = train_model_b(subset_ratio=1.0)
 
-            outputs = model(xb)
-            preds = outputs.argmax(1)
-
-            y_true.extend(yb.cpu().numpy())
-            y_pred.extend(preds.cpu().numpy())
-
-    y_true = np.array(y_true)
-    y_pred = np.array(y_pred)
-
-    cm = confusion_matrix(y_true, y_pred)
-    plot_confusion_matrix(cm)
-
-    return {
-        "accuracy": accuracy_score(y_true, y_pred),
-        "precision": precision_score(y_true, y_pred),
-        "recall": recall_score(y_true, y_pred),
-        "f1": f1_score(y_true, y_pred),
-    }
+    print("\n=== ALL EXPERIMENTS DONE ===")
 
 def report_results(results_dict):
     """
