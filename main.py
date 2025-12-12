@@ -28,5 +28,5 @@ if __name__ == "__main__":
     # check_model_b_data()
     # print("Data check finished.")
     run_model_a_experiments()
-    # run_model_b_experiments()
+    run_model_b_experiments()
 

@@ -29,32 +29,47 @@ class GaussianNoiseTransform:
 
 def get_transform(augment=False):
     """
-    CNN transform with optional augmentation
+    CNN transform with optional augmentation for BreastMNIST (28x28 grayscale)
     """
     pil_ops = []
     tensor_ops = []
 
     if augment:
+        # PIL-based transforms
         pil_ops.extend([
-            transforms.RandomHorizontalFlip(0.5),
-            transforms.RandomRotation(10),
-            transforms.ColorJitter(brightness=0.1, contrast=0.1),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomRotation(degrees=15),
+            transforms.ColorJitter(brightness=0.15, contrast=0.15),
+            transforms.RandomAffine(
+                degrees=10,
+                translate=(0.05, 0.05),
+                scale=(0.95, 1.05),
+                shear=5
+            ),
         ])
 
     # Tensor-only transforms
+    if augment:
+        tensor_ops.append(
+            transforms.ElasticTransform(alpha=3.0, sigma=5.0)
+        )
+
+        # cutout / random erasing
+        tensor_ops.append(
+            transforms.RandomErasing(p=0.25, scale=(0.02, 0.08), ratio=(0.3, 3.3))
+        )
+
+    # common transforms
     tensor_ops.extend([
         GaussianNoiseTransform(std=0.03),
         transforms.Normalize(mean=[0.5], std=[0.5]),
     ])
 
-    # Pipeline:
-    # PIL → PIL transforms → ToTensor → Tensor transforms
     return transforms.Compose(
         pil_ops
-        + [transforms.ToTensor()]
+        + [transforms.ToTensor()]   # transforms.ToTensor() must be between pil_ops and tensor_ops
         + tensor_ops
     )
-
 
 def get_datasets(augment_train=True):
     """

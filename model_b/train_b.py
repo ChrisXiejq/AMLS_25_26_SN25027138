@@ -1,30 +1,27 @@
 # Code/model_b/train_b.py
-
 import os
+from sklearn.metrics import confusion_matrix
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 
-from .cnn_model import SimpleCNN
+from .cnn_model import AMLSCNN
 from .data_loader_b import get_dataloaders
 from .metrics_b import evaluate_metrics
-from .plot_b import plot_learning_curve
-
+from .plot_b import ensure_dir, plot_confusion_matrix, plot_learning_curve
 
 def train_model_b(
     batch_size=64,
     lr=1e-3,
-    epochs=1,
+    epochs=20,
     augment=True,
-    subset_ratio=1.0,      # NEW: training budget
-    model_size="small",     # NEW: model capacity
-    device=None
+    subset_ratio=1.0,
+    model_size="small",
+    device="cpu",
+    patience=5          # >>> Early Stopping 参数
 ):
-
-    if device is None:
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-
+    
     print(f"[Model B - CNN] Training on device: {device}")
     print(f"  → augment={augment}, subset_ratio={subset_ratio}, model_size={model_size}")
 
@@ -34,15 +31,12 @@ def train_model_b(
         augment_train=augment
     )
 
-    # If subset training is requested
-    # ------- Training Budget -------
+    # ----- Training Budget -----
     if subset_ratio < 1.0:
         new_len = int(len(train_loader.dataset) * subset_ratio)
         print(f"  → Using {new_len}/{len(train_loader.dataset)} samples (training budget)")
 
         subset_ds = torch.utils.data.Subset(train_loader.dataset, range(new_len))
-
-        # rebuild loader
         train_loader = torch.utils.data.DataLoader(
             subset_ds,
             batch_size=batch_size,
@@ -50,22 +44,24 @@ def train_model_b(
             num_workers=2
         )
 
-    # ----- Define different capacity models -----
+    # ----- Model Capacity -----
     if model_size == "small":
-        model = SimpleCNN(num_classes=2, channels=[8, 16, 32]).to(device)
+        model = AMLSCNN(num_classes=2, channels=[8, 16, 32]).to(device)
     elif model_size == "medium":
-        model = SimpleCNN(num_classes=2, channels=[16, 32, 64]).to(device)
+        model = AMLSCNN(num_classes=2, channels=[16, 32, 64]).to(device)
     elif model_size == "large":
-        model = SimpleCNN(num_classes=2, channels=[32, 64, 128]).to(device)
+        model = AMLSCNN(num_classes=2, channels=[32, 64, 128]).to(device)
     else:
         raise ValueError("Unknown model_size")
-
-    model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     train_losses, val_losses, val_accuracies = [], [], []
+
+    # ===== Early Stopping 设置 =====
+    best_val_loss = float("inf")
+    patience_counter = 0
 
     # ===== Training Loop =====
     for epoch in range(1, epochs + 1):
@@ -108,15 +104,33 @@ def train_model_b(
 
         print(f"Epoch {epoch}: Train Loss={train_loss:.4f}, Val Loss={val_loss:.4f}, Val Acc={val_acc:.4f}")
 
+        # ===== Early Stopping 逻辑 =====
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            patience_counter = 0
+            best_model_state = model.state_dict()  # 保存最好模型
+        else:
+            patience_counter += 1
+            print(f"  → EarlyStopping counter: {patience_counter}/{patience}")
+
+        if patience_counter >= patience:
+            print("Early stopping triggered! Stopping training early.")
+            model.load_state_dict(best_model_state)
+            break
+
     # ----- Save learning curves -----
     plot_learning_curve(train_losses, val_losses, val_accuracies, suffix=model_size)
 
     # ----- Final Test Evaluation -----
     print("\n=== Test Evaluation ===")
-    results = evaluate_metrics(model, test_loader, device)
+    results, preds, labels = evaluate_metrics(model, test_loader, device, return_preds=True)
     print(results)
 
-    # ----- Save model -----
-    torch.save(model.state_dict(), f"model_b/cnn_{model_size}.pth")
+    cm = confusion_matrix(labels, preds)
+    suffix = f"{model_size}_aug{augment}_budget{subset_ratio}"
+    plot_confusion_matrix(cm, suffix=suffix)
+
+    ensure_dir("model_b/saved_models")
+    torch.save(model.state_dict(), f"model_b/saved_models/cnn_{model_size}_aug{augment}_budget{subset_ratio}.pth")
 
     return results

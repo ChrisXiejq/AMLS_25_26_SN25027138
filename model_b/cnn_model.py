@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class SimpleCNN(nn.Module):
+class AMLSCNN(nn.Module):
     def __init__(self, num_classes=2, channels=[8, 16, 32]):
         super().__init__()
 

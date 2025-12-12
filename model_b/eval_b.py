@@ -7,17 +7,17 @@ def run_model_b_experiments():
     os.makedirs("outputs/model_b", exist_ok=True)
 
     print("\n=== EXPERIMENT 1: Model Capacity ===")
-    cap_small  = train_model_b(model_size="small")
-    cap_medium = train_model_b(model_size="medium")
-    cap_large  = train_model_b(model_size="large")
+    # cap_small  = train_model_b(model_size="small")
+    # cap_medium = train_model_b(model_size="medium")
+    # cap_large  = train_model_b(model_size="large")
 
-    print("\n=== EXPERIMENT 2: Data Augmentation ===")
-    aug_off = train_model_b(augment=False, model_size="small")
-    aug_on  = train_model_b(augment=True,  model_size="small")
+    # print("\n=== EXPERIMENT 2: Data Augmentation ===")
+    # aug_off = train_model_b(augment=False, model_size="medium")
+    aug_on  = train_model_b(augment=True,  model_size="medium")
 
-    print("\n=== EXPERIMENT 3: Training Budget ===")
-    bud_30 = train_model_b(subset_ratio=0.3)
-    bud_100 = train_model_b(subset_ratio=1.0)
+    # print("\n=== EXPERIMENT 3: Training Budget ===")
+    # bud_30 = train_model_b(subset_ratio=0.3)
+    # bud_100 = train_model_b(subset_ratio=1.0)
 
     print("\n=== ALL EXPERIMENTS DONE ===")
 

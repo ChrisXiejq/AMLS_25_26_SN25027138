@@ -8,12 +8,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
-
 from skimage.feature import hog
 
 from .data_loader_a import load_numpy
 from .plot_a import plot_capacity_performance, plot_conf_matrix, plot_train_budget, ensure_dir
-
 
 def extract_hog_features(X):
     """Apply HOG feature extraction to each 28x28 image (Not flattened)."""
