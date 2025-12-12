@@ -1,0 +1,20 @@
+===== Experiment Log =====
+processed=False
+pca_dim=50
+capacity_list=[0.1, 1, 10]
+subset_ratio=0.1
+augment=False
+
+Training budget used = 54
+
+===== Training SVM (C=0.1) =====
+[Val ] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+[Test] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+
+===== Training SVM (C=1) =====
+[Val ] {'accuracy': 0.7564102564102564, 'precision': 0.75, 'recall': 1.0, 'f1': 0.8571428571428571}
+[Test] {'accuracy': 0.7628205128205128, 'precision': 0.7549668874172185, 'recall': 1.0, 'f1': 0.8603773584905661}
+
+===== Training SVM (C=10) =====
+[Val ] {'accuracy': 0.782051282051282, 'precision': 0.803030303030303, 'recall': 0.9298245614035088, 'f1': 0.8617886178861789}
+[Test] {'accuracy': 0.7628205128205128, 'precision': 0.7894736842105263, 'recall': 0.9210526315789473, 'f1': 0.8502024291497976}

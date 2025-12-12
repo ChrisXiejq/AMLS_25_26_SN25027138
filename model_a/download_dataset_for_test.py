@@ -17,7 +17,6 @@ def download_file(url, save_path):
 def prepare_breastmnist_dataset():
     """
     Download ONLY breastmnist.npz for local testing.
-    DO NOT submit dataset files in your final submission.
     """
     root = get_dataset_root()
 

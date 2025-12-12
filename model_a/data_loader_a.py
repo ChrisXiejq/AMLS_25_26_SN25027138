@@ -25,7 +25,7 @@ def load_numpy(split="train", flatten=True, normalize=True):
         split=split,
         root=root,
         download=False,
-        transform=None  # Keep the original numpy format
+        transform=None
     )
 
     X = ds.imgs.astype(np.float32)

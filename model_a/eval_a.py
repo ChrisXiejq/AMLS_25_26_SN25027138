@@ -1,65 +1,72 @@
+from datetime import datetime
 from .train_a import train_model_a
 
 def run_model_a_experiments():
-    print("\n========= Running Model A Experiments (SVM + PCA) =========\n")
 
+    # Create a unique RUN directory
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = f"model_a/logs/run_{timestamp}"
+    print(f"\n========= MODEL A EXPERIMENTS: {run_dir} =========\n")
+
+    # ----- Experiment 1: RAW -----
+    raw_dir = f"{run_dir}/raw"
     results_raw = train_model_a(
-        use_pca=False,
-        capacity_list=[0.1, 1, 10],
-        #TODO: subset_ratio=1.0,  # set to 1.0 for full training
-        subset_ratio=0.1,  # set to 0.1 for quick tests
+        processed=False,
         augment=False,
-        hog=False
+        subset_ratio=0.1,
+        log_dir=raw_dir
     )
-    report_results(results_raw, title="Model A Results raw pixels")
+    report_results(results_raw, title="RAW Features Results")
 
-    results_with_augment = train_model_a(
-        use_pca=False,
-        capacity_list=[0.1, 1, 10],
-        #TODO: subset_ratio=1.0,  # set to 1.0 for full training
-        subset_ratio=0.1,  # set to 0.1 for quick tests
+    # ----- Experiment 2: PROCESSED + HOG/PCA -----
+    processed_dir = f"{run_dir}/processed"
+    results_processed = train_model_a(
+        processed=True,
+        augment=False,
+        subset_ratio=0.1,
+        log_dir=processed_dir
+    )
+    report_results(results_processed, title="Processed Features Results")
+
+    # ----- Experiment 3: Augmentation -----
+    augment_dir = f"{run_dir}/augment"
+    results_aug = train_model_a(
+        processed=True,
         augment=True,
-        hog=False
+        subset_ratio=0.1,
+        log_dir=augment_dir
     )
-    report_results(results_with_augment, title="Model A Results with Augmentation")
+    report_results(results_aug, title="Augmented Data Results")
 
-    results_with_pca = train_model_a(
-        use_pca=True,
-        pca_dim=50,
-        capacity_list=[0.1, 1, 10],
-        #TODO: subset_ratio=1.0,  # set to 1.0 for full training
-        subset_ratio=0.1,  # set to 0.1 for quick tests
-        augment=False,
-        hog=False
+    # ----- Experiment 4: Different Training Budget -----
+    budget_dir = f"{run_dir}/budget_0.3"
+    results_budget = train_model_a(
+        processed=True,
+        augment=True,
+        subset_ratio=0.3,
+        log_dir=budget_dir
     )
-    report_results(results_with_pca, title="Model A Results with PCA")
+    report_results(results_budget, title="Training Budget 0.3 Results")
 
-    results_hog = train_model_a(
-        use_pca=False,
-        capacity_list=[0.1, 1, 10],
-        #TODO: subset_ratio=1.0,  # set to 1.0 for full training
-        subset_ratio=0.1,  # set to 0.1 for quick tests
-        augment=False,
-        hog=True
-    )
-    report_results(results_hog, title="Model A Results with HOG")
+    # Save summary
+    summary_path = f"{run_dir}/summary.txt"
+    with open(summary_path, "w") as f:
+        f.write("=== Model A Experiment Summary ===\n\n")
+        f.write(str(results_raw) + "\n\n")
+        f.write(str(results_processed) + "\n\n")
+        f.write(str(results_aug) + "\n\n")
+        f.write(str(results_budget) + "\n\n")
 
-    results_with_diff_budget = train_model_a(
-        use_pca=True,
-        pca_dim=50,
-        capacity_list=[0.1, 1, 10],
-        #TODO: change budget as needed
-        subset_ratio=0.3,  # training budget
-        augment=False,
-        hog=False
-    )
+    print(f"\n>>> All results saved under: {run_dir}/\n")
 
-    report_results(results_with_diff_budget, title="Model A Results with Training Budget 0.3")
 
 def report_results(results_dict, title="Model A Results"):
     """
-    输入 train_model_a() 的返回结果
-    格式化输出，用于写报告
+    print summary of results
+    inputs:
+        results_dict: dictionary from train_model_a()
+        title: title for the report
+    returns: None
     """
     print(f"\n================= {title} =================")
     for C, info in results_dict.items():
