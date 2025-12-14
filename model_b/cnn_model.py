@@ -4,6 +4,7 @@ import torch.nn.functional as F
 
 class AMLSCNN(nn.Module):
     def __init__(self, num_classes=2, channels=[8, 16, 32]):
+        """Simple CNN for 28x28 grayscale images."""
         super().__init__()
 
         c1, c2, c3 = channels
@@ -23,12 +24,14 @@ class AMLSCNN(nn.Module):
 
 
     def _forward_features(self, x):
+        """Feature extraction layers."""
         x = self.pool(F.relu(self.conv1(x)))  # 28->14
         x = self.pool(F.relu(self.conv2(x)))  # 14->7
         x = F.relu(self.conv3(x))             # 7->7
         return x
 
     def forward(self, x):
+        """Forward pass."""
         x = self._forward_features(x)
         x = torch.flatten(x, 1)
         x = self.fc(x)

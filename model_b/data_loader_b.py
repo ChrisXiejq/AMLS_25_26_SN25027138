@@ -30,6 +30,10 @@ class GaussianNoiseTransform:
 def get_transform(augment=False):
     """
     CNN transform with optional augmentation for BreastMNIST (28x28 grayscale)
+    Args:
+        augment (bool): whether to apply data augmentation
+    Returns:
+        torchvision.transforms.Compose: composed transform
     """
     pil_ops = []
     tensor_ops = []
@@ -74,6 +78,10 @@ def get_transform(augment=False):
 def get_datasets(augment_train=True):
     """
     returns train/val/test Dataset
+    Args:
+        augment_train (bool): whether to apply data augmentation to training set
+    Returns:
+        tuple: (train_ds, val_ds, test_ds)
     """
     root = get_dataset_root()
 

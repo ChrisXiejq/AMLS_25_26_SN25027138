@@ -2,6 +2,14 @@ from datetime import datetime
 from .train_a import train_model_a
 
 def run_model_a_experiments():
+    """
+    Run a series of experiments for Model A, logging results to unique directories.
+    experiments include:
+    1. RAW features
+    2. PROCESSED features with HOG + PCA
+    3. Data augmentation
+    4. Different training budgets
+    """
 
     # Create a unique RUN directory
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

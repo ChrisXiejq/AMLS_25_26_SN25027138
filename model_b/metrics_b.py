@@ -1,10 +1,21 @@
 import torch
 import numpy as np
 
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
-from .plot_b import plot_confusion_matrix
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 def evaluate_metrics(model, dataloader, device, return_preds=False):
+    """
+    Evaluate classification metrics for the given model and dataloader.
+    Args:
+        model (torch.nn.Module): Trained PyTorch model.
+        dataloader (torch.utils.data.DataLoader): DataLoader for evaluation data.
+        device (torch.device): Device to run the evaluation on.
+        return_preds (bool): Whether to return predictions and labels.
+    Returns:
+        dict: Dictionary containing accuracy, precision, recall, and F1-score.
+        (optional) np.ndarray: Predictions array if return_preds is True.
+        (optional) np.ndarray: Labels array if return_preds is True.
+    """
     model.eval()
     preds = []
     labels = []

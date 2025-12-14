@@ -2,13 +2,23 @@ import os
 import urllib.request
 
 def get_dataset_root():
-    """Return path to Datasets/BreastMNIST folder."""
+    """
+    Get the root directory for the BreastMNIST dataset.
+    Returns:
+        str: Path to the dataset root directory.
+    """
     dataset_root = os.path.join("./", "Datasets", "BreastMNIST")
     os.makedirs(dataset_root, exist_ok=True)
     return dataset_root
 
 
 def download_file(url, save_path):
+    """
+    Download a file from a URL to a specified local path.
+    Args:
+        url (str): URL of the file to download.
+        save_path (str): Local path to save the downloaded file.
+    """
     print(f"Downloading:\n  {url}\n→ {save_path}")
     urllib.request.urlretrieve(url, save_path)
     print("Done.")
@@ -17,6 +27,8 @@ def download_file(url, save_path):
 def prepare_breastmnist_dataset():
     """
     Download ONLY breastmnist.npz for local testing.
+    Returns:
+        str: Path to the dataset root directory.
     """
     root = get_dataset_root()
 

@@ -7,9 +7,11 @@ def ensure_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-def plot_learning_curve(train_losses, val_losses, val_accuracies, suffix=""):
-    ensure_dir("outputs/model_b")
-
+def plot_learning_curve(train_losses, val_losses, val_accuracies, suffix="", log_dir=None):
+    """
+    Save learning curves with experiment suffix:
+    e.g. loss_curve_small.png, accuracy_curve_large_augmented.png
+    """
     if suffix:
         suffix = f"_{suffix}"
 
@@ -21,7 +23,7 @@ def plot_learning_curve(train_losses, val_losses, val_accuracies, suffix=""):
     plt.title(f"Loss Curve{suffix}")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
-    plt.savefig(f"outputs/model_b/loss_curve{suffix}.png", dpi=300)
+    plt.savefig(f"{log_dir}/loss_curve{suffix}.png", dpi=300)
     plt.close()
 
     # Accuracy curve
@@ -31,16 +33,15 @@ def plot_learning_curve(train_losses, val_losses, val_accuracies, suffix=""):
     plt.title(f"Accuracy Curve{suffix}")
     plt.xlabel("Epoch")
     plt.ylabel("Accuracy")
-    plt.savefig(f"outputs/model_b/accuracy_curve{suffix}.png", dpi=300)
+    plt.savefig(f"{log_dir}/accuracy_curve{suffix}.png", dpi=300)
     plt.close()
 
 
-def plot_confusion_matrix(cm, suffix=""):
+def plot_confusion_matrix(cm, suffix="", log_dir=None):
     """
     Save confusion matrix with experiment suffix:
     e.g. confusion_small.png, confusion_large_augmented.png
     """
-    ensure_dir("outputs/model_b")
 
     if suffix:
         suffix = f"_{suffix}"
@@ -50,5 +51,5 @@ def plot_confusion_matrix(cm, suffix=""):
     plt.title(f"Confusion Matrix{suffix}")
     plt.xlabel("Predicted")
     plt.ylabel("True")
-    plt.savefig(f"outputs/model_b/confusion_matrix{suffix}.png", dpi=300)
+    plt.savefig(f"{log_dir}/confusion_matrix{suffix}.png", dpi=300)
     plt.close()

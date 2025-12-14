@@ -22,9 +22,9 @@ def build_model(capacity=1.0):
 def train_model_a(
     processed=False,
     pca_dim=50,
-    capacity_list=[0.1, 1, 10], # different C values for SVM
-    subset_ratio=1.0,     # training budget
-    augment=True,         # enable data augmentation
+    capacity_list=[0.1, 1, 10],
+    subset_ratio=1.0,
+    augment=True,    
     log_dir="model_a/logs"
 ):
     """
@@ -40,7 +40,7 @@ def train_model_a(
     """
     ensure_dir(log_dir)
     log_text = []
-    log_text.append(f"===== Experiment Log =====\n")
+    log_text.append("===== Experiment Log =====\n")
     log_text.append(f"processed={processed}\n")
     log_text.append(f"pca_dim={pca_dim}\n")
     log_text.append(f"capacity_list={capacity_list}\n")
@@ -136,6 +136,7 @@ def evaluate_model(model, X_test, y_test):
     }
 
 def write_log(filepath, content):
+    """Write content to a log file."""
     ensure_dir(os.path.dirname(filepath))
     with open(filepath, "w") as f:
         f.write(content)

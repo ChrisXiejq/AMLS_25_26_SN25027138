@@ -4,7 +4,13 @@ from skimage.feature import hog
 from sklearn.decomposition import PCA
 
 def extract_hog_features(X):
-    """Apply HOG feature extraction to each 28x28 image (Not flattened)."""
+    """
+    Extract HOG features from images.
+    Args:
+        X (numpy.ndarray): Input image array of shape (N, 28, 28).
+    Returns:
+        numpy.ndarray: HOG feature array.
+    """
     hog_features = []
     for img in X.reshape(-1, 28, 28):
         feat = hog(img, pixels_per_cell=(4, 4), cells_per_block=(2, 2), orientations=9)
@@ -13,9 +19,17 @@ def extract_hog_features(X):
 
 def prepare_features(X_train, X_val, X_test, mode="raw", pca_dim=50):
     """
-    mode:
-        "raw": flatten only
-        "processed": HOG + PCA
+    Prepare features based on the specified
+    mode: "raw" for raw pixel features,
+          "processed" for HOG + PCA features.
+    Args:
+        X_train (numpy.ndarray): Training images.
+        X_val (numpy.ndarray): Validation images.
+        X_test (numpy.ndarray): Test images.
+        mode (str): Feature mode.
+        pca_dim (int): Target dimension for PCA.
+    Returns:
+        X_train, X_val, X_test: Transformed feature arrays.
     """
     if mode == "raw":
         print("Using RAW pixel features...")

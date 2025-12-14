@@ -4,7 +4,11 @@ from medmnist import BreastMNIST
 
 
 def get_dataset_root():
-    """Return path to Datasets/BreastMNIST folder."""
+    """
+    Get the root directory for the BreastMNIST dataset.
+    Returns:
+        str: Path to the dataset root directory.
+    """
     dataset_root = os.path.join("./", "Datasets", "BreastMNIST")
     os.makedirs(dataset_root, exist_ok=True)
     return dataset_root
@@ -16,6 +20,9 @@ def load_numpy(split="train", flatten=True, normalize=True):
     - split: 'train', 'val', 'test'
     - flatten: whether to flatten (N, 784)
     - normalize: whether to divide by 255
+    Returns:
+        X (numpy.ndarray): Image data.
+        y (numpy.ndarray): Labels.
     """
     assert split in ["train", "val", "test"]
 
@@ -31,7 +38,6 @@ def load_numpy(split="train", flatten=True, normalize=True):
     X = ds.imgs.astype(np.float32)
     y = ds.labels.squeeze()
 
-    # Some versions may have shape (N, 28, 28, 3), take grayscale
     if X.ndim == 4:
         X = X[..., 0]
 
