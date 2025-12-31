@@ -36,7 +36,7 @@ def prepare_breastmnist_dataset():
     npz_path = os.path.join(root, "breastmnist.npz")
 
     # Official dataset link
-    npz_url = "https://zenodo.org/records/6496656/files/breastmnist.npz"
+    npz_url = "https://zenodo.org/records/10519652/files/breastmnist.npz"
 
     if os.path.exists(npz_path):
         print(f"BreastMNIST dataset already exists at: {root}")

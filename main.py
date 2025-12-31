@@ -5,7 +5,6 @@ from model_b.eval_b import run_model_b_experiments
 
 if __name__ == "__main__":
 
-    # prepare_breastmnist_dataset()
+    prepare_breastmnist_dataset()
     run_model_a_experiments()
     run_model_b_experiments()
-

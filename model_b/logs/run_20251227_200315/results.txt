@@ -1,0 +1,9 @@
+=============== MODEL B EXPERIMENTS ===============
+Run directory: model_b/logs/run_20251227_200315
+Timestamp: 20251227_200315
+===================================================
+
+=== EXPERIMENT 1: Model Capacity ===
+
+=== EXPERIMENT 2: Data Augmentation ===
+with augmentation: {'accuracy': 0.8012820512820513, 'precision': 0.816793893129771, 'recall': 0.9385964912280702, 'f1': 0.8734693877551021}

@@ -6,6 +6,7 @@ import seaborn as sns
 
 
 def ensure_dir(path):
+    """Ensure directory exists."""
     if not os.path.exists(path):
         os.makedirs(path)
 
