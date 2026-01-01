@@ -9,8 +9,8 @@ def augment_image(img):
     Returns:
         numpy.ndarray: Augmented image array.
     """
-    # random rotation (−15° ~ +15°)
-    angle = np.random.uniform(-15, 15)
+    # random rotation (−10° ~ +10°)
+    angle = np.random.uniform(-10, 10)
     img = ndimage.rotate(img, angle, reshape=False, mode="nearest")
 
     # random horizontal flip
@@ -19,7 +19,7 @@ def augment_image(img):
 
     # add gaussian noise
     if np.random.rand() < 0.3:
-        noise = np.random.normal(0, 0.05, img.shape)
+        noise = np.random.normal(0, 0.03, img.shape)
         img = img + noise
 
     return np.clip(img, 0, 1)

@@ -3,10 +3,42 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import seaborn as sns
+from sklearn.metrics import roc_curve, roc_auc_score
 
 def ensure_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+
+def plot_five_dimension_comparison(all_results, run_dir):
+    """
+    Create five comparison plots for different dimensions:
+    Dimension 1: Augmentation impact (no aug vs with aug)
+    Dimension 2: Model capacity impact (small, medium, large)
+    Dimension 3: Training budget impact (different ratios)
+    Dimension 4: Optimizer impact (adam, sgd, rmsprop)
+    Dimension 5: Loss function impact (crossentropy vs focal)
+    
+    args:
+        all_results: dict with dimension data
+        run_dir: directory to save plots
+    """
+    ensure_dir(run_dir)
+    
+    # Plot 1: Augmentation Impact
+    plot_augmentation_impact(all_results, run_dir)
+    
+    # Plot 2: Capacity Impact
+    plot_capacity_impact(all_results, run_dir)
+    
+    # Plot 3: Budget Impact
+    plot_budget_impact(all_results, run_dir)
+    
+    # Plot 4: Optimizer Impact
+    plot_optimizer_impact(all_results, run_dir)
+    
+    # Plot 5: Loss Function Impact
+    plot_loss_function_impact(all_results, run_dir)
 
 
 def plot_four_dimension_comparison(all_results, run_dir):
@@ -23,16 +55,16 @@ def plot_four_dimension_comparison(all_results, run_dir):
     """
     ensure_dir(run_dir)
     
-    # ===== Plot 1: Augmentation Impact =====
+    # Plot 1: Augmentation Impact
     plot_augmentation_impact(all_results, run_dir)
     
-    # ===== Plot 2: Capacity Impact =====
+    # Plot 2: Capacity Impact
     plot_capacity_impact(all_results, run_dir)
     
-    # ===== Plot 3: Budget Impact =====
+    # Plot 3: Budget Impact
     plot_budget_impact(all_results, run_dir)
     
-    # ===== Plot 4: Optimizer Impact =====
+    # Plot 4: Optimizer Impact
     plot_optimizer_impact(all_results, run_dir)
 
 
@@ -40,6 +72,9 @@ def plot_augmentation_impact(all_results, run_dir):
     """
     Dimension 1: Compare No Aug vs With Aug
     Shows impact of data augmentation
+    args:
+        all_results: dict with dimension data
+        run_dir: directory to save plots
     """
     no_aug = all_results["dim1_no_aug"]
     aug = all_results["dim1_aug"]
@@ -224,6 +259,58 @@ def plot_optimizer_impact(all_results, run_dir):
     print(f"  ✓ Saved: dim4_optimizer_impact.png")
 
 
+def plot_loss_function_impact(all_results, run_dir):
+    """
+    Dimension 5: Compare different loss functions (crossentropy vs focal)
+    Shows how loss function choice affects performance
+    """
+    loss_data = all_results["dim5_loss_functions"]
+    
+    loss_fns = ["crossentropy", "focal"]
+    accs = [loss_data[lf]["accuracy"] for lf in loss_fns]
+    f1s = [loss_data[lf]["f1"] for lf in loss_fns]
+    
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    
+    x_pos = np.arange(len(loss_fns))
+    labels = ["CrossEntropy", "Focal Loss"]
+    colors = ["#FF6B9D", "#C44569"]
+    
+    # Accuracy plot
+    bars1 = axes[0].bar(x_pos, accs, color=colors, alpha=0.7, edgecolor="black", linewidth=1.5)
+    axes[0].set_xticks(x_pos)
+    axes[0].set_xticklabels(labels, fontsize=11)
+    axes[0].set_ylabel("Test Accuracy", fontsize=11)
+    axes[0].set_title("Dimension 5: Loss Function Impact", fontsize=12, fontweight="bold")
+    axes[0].set_ylim([0, 1])
+    axes[0].grid(axis="y", alpha=0.3)
+    for i, v in enumerate(accs):
+        axes[0].text(i, v + 0.02, f"{v:.4f}", ha="center", va="bottom", fontweight="bold", fontsize=10)
+    
+    # F1-score plot
+    bars2 = axes[1].bar(x_pos, f1s, color=colors, alpha=0.7, edgecolor="black", linewidth=1.5)
+    axes[1].set_xticks(x_pos)
+    axes[1].set_xticklabels(labels, fontsize=11)
+    axes[1].set_ylabel("Test F1-score", fontsize=11)
+    axes[1].set_title("Dimension 5: Loss Function Impact (F1-score)", fontsize=12, fontweight="bold")
+    axes[1].set_ylim([0, 1])
+    axes[1].grid(axis="y", alpha=0.3)
+    for i, v in enumerate(f1s):
+        axes[1].text(i, v + 0.02, f"{v:.4f}", ha="center", va="bottom", fontweight="bold", fontsize=10)
+    
+    # Add comparison note
+    diff = (accs[1] - accs[0]) * 100
+    note = f"Focal vs CE: {diff:+.2f}%"
+    axes[0].text(0.5, 0.05, note, ha="center", va="bottom", transform=axes[0].transAxes,
+                bbox=dict(boxstyle="round", facecolor="lightyellow", alpha=0.7),
+                fontsize=10, fontweight="bold")
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(run_dir, "dim5_loss_function_impact.png"), dpi=300, bbox_inches="tight")
+    plt.close()
+    print(f"  ✓ Saved: dim5_loss_function_impact.png")
+
+
 def plot_learning_curve(train_losses, val_losses, val_accuracies, suffix="", log_dir=None):
     """
     Save learning curves with experiment suffix:
@@ -269,4 +356,27 @@ def plot_confusion_matrix(cm, suffix="", log_dir=None):
     plt.xlabel("Predicted")
     plt.ylabel("True")
     plt.savefig(f"{log_dir}/confusion_matrix{suffix}.png", dpi=300)
+    plt.close()
+
+
+def plot_roc_curve(labels, probs, suffix="", log_dir=None):
+    """Plot ROC curve using predicted probabilities for the positive class."""
+    if suffix:
+        suffix = f"_{suffix}"
+
+    fpr, tpr, _ = roc_curve(labels, probs)
+    auc = roc_auc_score(labels, probs)
+
+    plt.figure(figsize=(6, 5))
+    plt.plot(fpr, tpr, color="#4ECDC4", lw=2, label=f"AUC = {auc:.3f}")
+    plt.plot([0, 1], [0, 1], color="grey", lw=1, linestyle="--", label="Random")
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title(f"ROC Curve{suffix}")
+    plt.legend(loc="lower right")
+    plt.grid(alpha=0.3)
+    ensure_dir(log_dir)
+    plt.savefig(f"{log_dir}/roc_curve{suffix}.png", dpi=300, bbox_inches="tight")
     plt.close()

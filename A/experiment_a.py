@@ -9,6 +9,10 @@ def run_model_a_experiments():
     Dimension 2: Augmentation (processed: no aug vs with aug)
     Dimension 3: Model capacity (processed+aug: different C values)
     Dimension 4: Training budget (processed+aug+best_C: different data ratios)
+    arguments:
+        None
+    returns:
+        None
     """
 
     # Create a unique RUN directory
@@ -18,7 +22,7 @@ def run_model_a_experiments():
 
     all_results = {}
 
-    # ===== DIMENSION 1: PRE-PROCESSING COMPARISON =====
+    # DIMENSION 1: PRE-PROCESSING COMPARISON
     print("\n[Dimension 1] Pre-processing: Raw vs Processed")
     print("=" * 50)
     
@@ -46,7 +50,7 @@ def run_model_a_experiments():
     report_results(results_processed, title="PROCESSED Features (HOG+PCA)")
     all_results["dim1_processed"] = results_processed
 
-    # ===== DIMENSION 2: AUGMENTATION COMPARISON =====
+    # DIMENSION 2: AUGMENTATION COMPARISON
     print("\n[Dimension 2] Augmentation: Processed (No Aug) vs Processed (With Aug)")
     print("=" * 50)
     
@@ -70,13 +74,13 @@ def run_model_a_experiments():
                  key=lambda c: results_processed_aug[c]["test"]["accuracy"])
     print(f"\n  > Best capacity found: C={best_C}")
 
-    # ===== DIMENSION 3: CAPACITY COMPARISON (using best config) =====
+    # DIMENSION 3: CAPACITY COMPARISON (using best config)
     print("\n[Dimension 3] Model Capacity: Different C values (Processed+Aug)")
     print("=" * 50)
     print("  > Already trained in Dimension 2")
     all_results["dim3_capacity"] = results_processed_aug
 
-    # ===== DIMENSION 4: TRAINING BUDGET COMPARISON =====
+    # DIMENSION 4: TRAINING BUDGET COMPARISON
     print("\n[Dimension 4] Training Budget: Different data ratios (Processed+Aug, C={})".format(best_C))
     print("=" * 50)
     
@@ -90,13 +94,13 @@ def run_model_a_experiments():
             processed=True,
             augment=True,
             subset_ratio=ratio,
-            capacity_list=[best_C],  # Use only best C
+            # capacity_list=[best_C],  # Use only best C
             log_dir=budget_dir
         )
         report_results(results_budget, title=f"Budget {ratio*100:.0f}%")
         all_results["dim4_budgets"][ratio] = results_budget[best_C]
 
-    # ===== GENERATE FOUR DIMENSION COMPARISON PLOTS =====
+    # GENERATE FOUR DIMENSION COMPARISON PLOTS
     print("\n[Generating 4 comparison plots...]")
     plot_four_dimension_comparison(all_results, run_dir, best_C)
 

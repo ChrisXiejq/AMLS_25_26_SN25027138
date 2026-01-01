@@ -1,7 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score
 import seaborn as sns
 
 
@@ -26,16 +26,16 @@ def plot_four_dimension_comparison(all_results, run_dir, best_C):
     """
     ensure_dir(run_dir)
     
-    # ===== Plot 1: Pre-processing Impact (Raw vs Processed) =====
+    # Plot 1: Pre-processing Impact (Raw vs Processed)
     plot_preprocessing_impact(all_results, run_dir)
     
-    # ===== Plot 2: Augmentation Impact (Processed: No Aug vs With Aug) =====
+    # Plot 2: Augmentation Impact (Processed: No Aug vs With Aug)
     plot_augmentation_impact(all_results, run_dir)
     
-    # ===== Plot 3: Capacity Impact (Processed+Aug: different C values) =====
+    # Plot 3: Capacity Impact (Processed+Aug: different C values)
     plot_capacity_impact(all_results, run_dir, best_C)
     
-    # ===== Plot 4: Training Budget Impact (Processed+Aug+Best_C: different budgets) =====
+    # Plot 4: Training Budget Impact (Processed+Aug+Best_C: different budgets)
     plot_budget_impact(all_results, run_dir, best_C)
 
 
@@ -43,6 +43,9 @@ def plot_preprocessing_impact(all_results, run_dir):
     """
     Dimension 1: Compare RAW vs PROCESSED features
     Shows impact of HOG+PCA preprocessing
+    args:
+        all_results: dict with dimension data
+        run_dir: directory to save plots
     """
     results_raw = all_results["dim1_raw"]
     results_processed = all_results["dim1_processed"]
@@ -96,6 +99,9 @@ def plot_augmentation_impact(all_results, run_dir):
     """
     Dimension 2: Compare Processed (No Aug) vs Processed (With Aug)
     Shows impact of data augmentation
+    args:
+        all_results: dict with dimension data
+        run_dir: directory to save plots
     """
     results_no_aug = all_results["dim2_processed_no_aug"]
     results_aug = all_results["dim2_processed_aug"]
@@ -156,6 +162,10 @@ def plot_capacity_impact(all_results, run_dir, best_C):
     """
     Dimension 3: Compare different capacity (C) values using Processed+Aug
     Shows how different C values affect performance
+    args:
+        all_results: dict with dimension data
+        run_dir: directory to save plots
+        best_C: the best capacity value found
     """
     results = all_results["dim3_capacity"]
     
@@ -199,6 +209,10 @@ def plot_budget_impact(all_results, run_dir, best_C):
     """
     Dimension 4: Compare different training budgets using Processed+Aug+Best_C
     Shows how training data ratio affects performance
+    args:
+        all_results: dict with dimension data
+        run_dir: directory to save plots
+        best_C: the best capacity value found
     """
     budget_data = all_results["dim4_budgets"]
     
@@ -270,7 +284,14 @@ def plot_capacity_performance(results, save_dir):
 
 
 def plot_conf_matrix(results, C_best, X_test, y_test, save_dir):
-    """ visualize: confusion matrix """
+    """ visualize: confusion matrix
+     args:
+        results: dict from train_model_a
+        C_best: best capacity value
+        X_test: test features
+        y_test: test labels
+        save_dir: directory to save plots
+    """
     ensure_dir(save_dir)
 
     model = results[C_best]["model"]
@@ -288,8 +309,38 @@ def plot_conf_matrix(results, C_best, X_test, y_test, save_dir):
     plt.close()
 
 
+def plot_roc_curve(y_true, scores, save_path, title="ROC Curve"):
+    """Plot ROC curve and save to disk.
+    args:
+        y_true: true labels
+        scores: predicted scores or probabilities
+        save_path: file path to save the plot
+        title: plot title
+    """
+    fpr, tpr, _ = roc_curve(y_true, scores)
+    auc = roc_auc_score(y_true, scores)
+
+    plt.figure(figsize=(6, 5))
+    plt.plot(fpr, tpr, color="#4ECDC4", lw=2, label=f"AUC = {auc:.3f}")
+    plt.plot([0, 1], [0, 1], color="grey", lw=1, linestyle="--", label="Random")
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title(title)
+    plt.legend(loc="lower right")
+    plt.grid(alpha=0.3)
+    ensure_dir(os.path.dirname(save_path))
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+    plt.close()
+
+
 def plot_train_budget(budget_results, save_dir):
-    """visualize: training budget vs performance"""
+    """visualize: training budget vs performance
+    args:
+        budget_results: dict with budget ratio as keys and results as values
+        save_dir: directory to save plots
+    """
     ensure_dir(save_dir)
 
     ratios = []
@@ -307,4 +358,53 @@ def plot_train_budget(budget_results, save_dir):
     plt.grid(True)
 
     plt.savefig(os.path.join(save_dir, "training_budget.png"), dpi=300)
+    plt.close()
+
+
+def plot_learning_curve_data(ratios, accs, f1s, save_dir, filename="learning_curve.png"):
+    """Plot learning curve: data size ratio vs metrics.
+    args:
+        ratios: list of data size ratios
+        accs: list of accuracies
+        f1s: list of f1-scores
+        save_dir: directory to save plots
+        filename: name of the output file"""
+    ensure_dir(save_dir)
+
+    ratios = np.array(ratios)
+    accs = np.array(accs)
+    f1s = np.array(f1s)
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(ratios * 100, accs, marker="o", label="Test Accuracy", color="#4ECDC4", linewidth=2)
+    plt.plot(ratios * 100, f1s, marker="s", label="Test F1-score", color="#FF6B6B", linewidth=2)
+    plt.xlabel("Training Data Used (%)")
+    plt.ylabel("Score")
+    plt.title("Learning Curve (Data Size vs Performance)")
+    plt.ylim([0, 1])
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+
+    plt.savefig(os.path.join(save_dir, filename), dpi=300, bbox_inches="tight")
+    plt.close()
+
+
+def plot_feature_projection(X_2d, y, save_path, title="Feature Projection"):
+    """Scatter plot of 2D projected features.
+    args:
+        X_2d: 2D projected features (numpy array of shape [n_samples, 2])
+        y: labels (numpy array of shape [n_samples])
+        save_path: file path to save the plot
+        title: plot title
+    """
+    plt.figure(figsize=(6, 5))
+    scatter = plt.scatter(X_2d[:, 0], X_2d[:, 1], c=y, cmap="coolwarm", alpha=0.7, edgecolor="k", s=40)
+    plt.xlabel("Component 1")
+    plt.ylabel("Component 2")
+    plt.title(title)
+    plt.grid(True, alpha=0.3)
+    cbar = plt.colorbar(scatter)
+    cbar.set_label("Label")
+    ensure_dir(os.path.dirname(save_path))
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
     plt.close()

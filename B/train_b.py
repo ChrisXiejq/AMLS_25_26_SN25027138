@@ -9,13 +9,17 @@ from tqdm import tqdm
 from .cnn_model import AMLSCNN
 from .data_loader_b import get_dataloaders
 from .metrics_b import evaluate_metrics
-from .plot_b import ensure_dir, plot_confusion_matrix, plot_learning_curve
+from .plot_b import ensure_dir, plot_confusion_matrix, plot_learning_curve, plot_roc_curve
 
 
 class FocalLoss(nn.Module):
     """
     Focal Loss for addressing class imbalance.
     Reference: Lin et al. "Focal Loss for Dense Object Detection"
+    args:
+        alpha (float): balancing factor
+        gamma (float): focusing parameter
+        reduction (str): 'mean' or 'sum' for loss reduction
     """
     def __init__(self, alpha=0.25, gamma=2.0, reduction='mean'):
         super(FocalLoss, self).__init__()
@@ -34,8 +38,6 @@ class FocalLoss(nn.Module):
             return focal_loss.sum()
         else:
             return focal_loss
-
-from .plot_b import ensure_dir, plot_confusion_matrix, plot_learning_curve
 
 def get_optimizer(optimizer_name, model_params, lr):
     """Return optimizer based on name."""
@@ -131,10 +133,19 @@ def train_model_b(
     else:
         raise ValueError("Unknown model_size")
 
-    criterion = nn.CrossEntropyLoss()
+    # Loss Function Selection
+    if loss_function.lower() == "crossentropy":
+        criterion = nn.CrossEntropyLoss()
+        print(f"  → Using CrossEntropyLoss")
+    elif loss_function.lower() == "focal":
+        criterion = FocalLoss(alpha=0.25, gamma=2.0)
+        print(f"  → Using FocalLoss (alpha=0.25, gamma=2.0)")
+    else:
+        raise ValueError(f"Unknown loss_function: {loss_function}")
+    
     optimizer = get_optimizer(optimizer_name, model.parameters(), lr)
     
-    # 添加学习率调度器，提升训练效果
+    # Learning Rate Scheduler
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='min', factor=0.5, patience=3
     )
@@ -187,7 +198,7 @@ def train_model_b(
         print(f"Epoch {epoch}: Train Loss={train_loss:.4f}, Val Loss={val_loss:.4f}, Val Acc={val_acc:.4f}")
         log_text.append(f"Epoch {epoch}: Train Loss={train_loss:.4f}, Val Loss={val_loss:.4f}, Val Acc={val_acc:.4f}\n")
 
-        # 学习率调度
+        # Learning Rate Scheduler
         scheduler.step(val_loss)
 
         # Early Stopping 
@@ -209,7 +220,7 @@ def train_model_b(
 
     # Final Test Evaluation
     print("\n=== Test Evaluation ===")
-    results, preds, labels = evaluate_metrics(model, test_loader, device, return_preds=True)
+    results, preds, labels, probs = evaluate_metrics(model, test_loader, device, return_preds=True, return_probs=True)
     print(results)
     log_text.append("\n=== Test Evaluation ===\n")
     for metric, value in results.items():
@@ -218,6 +229,7 @@ def train_model_b(
     cm = confusion_matrix(labels, preds)
     suffix = f"{model_size}_aug{augment}_budget{subset_ratio}"
     plot_confusion_matrix(cm, suffix=suffix, log_dir=log_dir)
+    plot_roc_curve(labels, probs, suffix=suffix, log_dir=log_dir)
 
     ensure_dir("B/saved_models")
     torch.save(model.state_dict(), f"B/saved_models/cnn_{model_size}_aug{augment}_budget{subset_ratio}_optim{optimizer_name}.pth")

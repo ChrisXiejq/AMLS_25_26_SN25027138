@@ -39,29 +39,29 @@ def get_transform(augment=False):
     tensor_ops = []
 
     if augment:
-        # PIL-based transforms - 减少激进程度，更适合医学图像
+        # PIL-based transforms
         pil_ops.extend([
-            transforms.RandomHorizontalFlip(p=0.5),  # 保留水平翻转
-            transforms.RandomRotation(degrees=10),    # 减少旋转角度 15->10
-            transforms.ColorJitter(brightness=0.1, contrast=0.1),  # 减少亮度/对比度变化 0.15->0.1
+            transforms.RandomHorizontalFlip(p=0.5),  # horizontal flip with 50% chance
+            transforms.RandomRotation(degrees=10),    # reduce rotation angle from 15 to 10
+            transforms.ColorJitter(brightness=0.1, contrast=0.1),  # reduce brightness/contrast variation from 0.15 to 0.1
             transforms.RandomAffine(
-                degrees=5,              # 减少仿射变换角度 10->5
-                translate=(0.03, 0.03), # 减少平移 0.05->0.03
-                scale=(0.97, 1.03),     # 减少缩放范围
-                shear=3                 # 减少剪切 5->3
+                degrees=5,              # reduce affine transform angle from 10 to 5
+                translate=(0.03, 0.03), # reduce translation from 0.05 to 0.03
+                scale=(0.97, 1.03),     # reduce scaling range from 0.9-1.1 to 0.97-1.03
+                shear=3                 # reduce shear from 5 to 3
             ),
         ])
 
     # Tensor-only transforms
     if augment:
-        # 移除 ElasticTransform - 对医学图像过于激进
+        # Removed ElasticTransform - too aggressive for medical images
         # tensor_ops.append(
         #     transforms.ElasticTransform(alpha=3.0, sigma=5.0)
         # )
 
-        # cutout / random erasing - 降低概率和强度
+        # cutout / random erasing - reduce probability and intensity
         tensor_ops.append(
-            transforms.RandomErasing(p=0.15, scale=(0.02, 0.05), ratio=(0.5, 2.0))  # 降低擦除强度
+            transforms.RandomErasing(p=0.15, scale=(0.02, 0.05), ratio=(0.5, 2.0))  # reduce erasing intensity
         )
 
     # common transforms

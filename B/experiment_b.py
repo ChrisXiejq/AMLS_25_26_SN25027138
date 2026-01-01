@@ -1,15 +1,16 @@
 import os
 from datetime import datetime
 from .train_b import train_model_b
-from .plot_b import plot_four_dimension_comparison
+from .plot_b import plot_five_dimension_comparison
 
 def run_model_b_experiments():
     """
-    Run four-dimensional experiments for Model B:
+    Run five-dimensional experiments for Model B:
     Dimension 1: Augmentation (no aug vs with aug)
     Dimension 2: Model capacity (small, medium, large)
     Dimension 3: Training budget (different data ratios)
     Dimension 4: Optimizer (adam, sgd, rmsprop)
+        Dimension 5: Loss function (crossentropy vs focal)
     """
 
     # Create a unique RUN directory
@@ -19,7 +20,7 @@ def run_model_b_experiments():
 
     all_results = {}
 
-    # ===== DIMENSION 1: AUGMENTATION COMPARISON =====
+    # DIMENSION 1: AUGMENTATION COMPARISON
     print("\n[Dimension 1] Augmentation: No Aug vs With Aug")
     print("=" * 50)
     
@@ -47,7 +48,7 @@ def run_model_b_experiments():
     report_results(results_aug, "With Augmentation")
     all_results["dim1_aug"] = results_aug
 
-    # ===== DIMENSION 2: CAPACITY COMPARISON =====
+    # DIMENSION 2: CAPACITY COMPARISON
     print("\n[Dimension 2] Model Capacity: Small, Medium, Large")
     print("=" * 50)
     
@@ -65,7 +66,7 @@ def run_model_b_experiments():
         report_results(result, f"Capacity: {size}")
         all_results["dim2_capacity"][size] = result
 
-    # ===== DIMENSION 3: TRAINING BUDGET COMPARISON =====
+    # DIMENSION 3: TRAINING BUDGET COMPARISON
     print("\n[Dimension 3] Training Budget: Different data ratios")
     print("=" * 50)
     
@@ -84,7 +85,7 @@ def run_model_b_experiments():
         report_results(result, f"Budget {ratio*100:.0f}%")
         all_results["dim3_budgets"][ratio] = result
 
-    # ===== DIMENSION 4: OPTIMIZER COMPARISON =====
+    # DIMENSION 4: OPTIMIZER COMPARISON
     print("\n[Dimension 4] Optimizer: Adam, SGD, RMSprop")
     print("=" * 50)
     
@@ -103,9 +104,29 @@ def run_model_b_experiments():
         report_results(result, f"Optimizer: {opt}")
         all_results["dim4_optimizers"][opt] = result
 
-    # ===== GENERATE FOUR DIMENSION COMPARISON PLOTS =====
-    print("\n[Generating 4 comparison plots...]")
-    plot_four_dimension_comparison(all_results, run_dir)
+    # DIMENSION 5: LOSS FUNCTION COMPARISON
+    print("\n[Dimension 5] Loss Function: CrossEntropy vs Focal Loss")
+    print("=" * 50)
+    
+    all_results["dim5_loss_functions"] = {}
+    
+    for loss_fn in ["crossentropy", "focal"]:
+        print(f"\n  > Training with {loss_fn.upper()} loss...")
+        loss_dir = f"{run_dir}/dim5_{loss_fn}"
+        result = train_model_b(
+            augment=True,
+            model_size="medium",
+            subset_ratio=1.0,
+            optimizer_name="adam",
+            loss_function=loss_fn,
+            log_dir=loss_dir
+        )
+        report_results(result, f"Loss Function: {loss_fn}")
+        all_results["dim5_loss_functions"][loss_fn] = result
+
+    # GENERATE FIVE DIMENSION COMPARISON PLOTS
+    print("\n[Generating 5 comparison plots...]")
+    plot_five_dimension_comparison(all_results, run_dir)
 
     # Save summary
     summary_path = f"{run_dir}/summary.txt"
