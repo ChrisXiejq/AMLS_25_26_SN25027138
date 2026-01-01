@@ -1,0 +1,30 @@
+=============== MODEL B EXPERIMENTS ===============
+Run directory: B/logs/run_20260101_172013
+Timestamp: 20260101_172013
+===================================================
+
+=== EXPERIMENT 1: Model Capacity ===
+small:  {'accuracy': 0.782051282051282, 'precision': 0.7777777777777778, 'recall': 0.9824561403508771, 'f1': 0.8682170542635659}
+medium: {'accuracy': 0.7628205128205128, 'precision': 0.7692307692307693, 'recall': 0.9649122807017544, 'f1': 0.8560311284046692}
+large:  {'accuracy': 0.8012820512820513, 'precision': 0.8074074074074075, 'recall': 0.956140350877193, 'f1': 0.8755020080321285}
+
+=== EXPERIMENT 2: Data Augmentation ===
+no augmentation: {'accuracy': 0.8269230769230769, 'precision': 0.848, 'recall': 0.9298245614035088, 'f1': 0.8870292887029289}
+with augmentation: {'accuracy': 0.8141025641025641, 'precision': 0.8102189781021898, 'recall': 0.9736842105263158, 'f1': 0.8844621513944223}
+
+=== EXPERIMENT 3: Training Budget ===
+30% budget: {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+100% budget: {'accuracy': 0.7564102564102564, 'precision': 0.75, 'recall': 1.0, 'f1': 0.8571428571428571}
+
+=== EXPERIMENT 4: Optimizer Comparison ===
+
+>>> Running optimizer = sgd
+sgd: {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+
+>>> Running optimizer = adam
+adam: {'accuracy': 0.8141025641025641, 'precision': 0.8195488721804511, 'recall': 0.956140350877193, 'f1': 0.8825910931174089}
+
+>>> Running optimizer = rmsprop
+rmsprop: {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+
+=== ALL EXPERIMENTS DONE ===

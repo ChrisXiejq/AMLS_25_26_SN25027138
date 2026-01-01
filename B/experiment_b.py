@@ -1,93 +1,132 @@
 import os
 from datetime import datetime
 from .train_b import train_model_b
+from .plot_b import plot_four_dimension_comparison
 
 def run_model_b_experiments():
     """
-    Run a series of experiments for Model B, logging results to unique directories.
-    experiments include:
-    1. Model capacity variations
-    2. Data augmentation effects
-    3. Training budget impacts
-    4. Different optimizers
+    Run four-dimensional experiments for Model B:
+    Dimension 1: Augmentation (no aug vs with aug)
+    Dimension 2: Model capacity (small, medium, large)
+    Dimension 3: Training budget (different data ratios)
+    Dimension 4: Optimizer (adam, sgd, rmsprop)
     """
 
     # Create a unique RUN directory
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir = f"B/logs/run_{timestamp}"
+    print(f"\n========= MODEL B EXPERIMENTS: {run_dir} =========\n")
 
-    # Create a TXT file for logging
-    os.makedirs(run_dir, exist_ok=True)
-    log_path = os.path.join(run_dir, "results.txt")
-    log_file = open(log_path, "w")
+    all_results = {}
 
-    # ------------------------------
-    # Helper: print to screen + file
-    def log(msg):
-        print(msg)
-        log_file.write(msg + "\n")
+    # ===== DIMENSION 1: AUGMENTATION COMPARISON =====
+    print("\n[Dimension 1] Augmentation: No Aug vs With Aug")
+    print("=" * 50)
+    
+    # No augmentation
+    print("\n  > Training WITHOUT augmentation...")
+    no_aug_dir = f"{run_dir}/dim1_no_aug"
+    results_no_aug = train_model_b(
+        augment=False,
+        model_size="medium",
+        subset_ratio=1.0,
+        log_dir=no_aug_dir
+    )
+    report_results(results_no_aug, "No Augmentation")
+    all_results["dim1_no_aug"] = results_no_aug
 
-    # Start logging
-    log("=============== MODEL B EXPERIMENTS ===============")
-    log(f"Run directory: {run_dir}")
-    log("Timestamp: " + timestamp)
-    log("===================================================")
+    # With augmentation
+    print("\n  > Training WITH augmentation...")
+    aug_dir = f"{run_dir}/dim1_aug"
+    results_aug = train_model_b(
+        augment=True,
+        model_size="medium",
+        subset_ratio=1.0,
+        log_dir=aug_dir
+    )
+    report_results(results_aug, "With Augmentation")
+    all_results["dim1_aug"] = results_aug
 
-    log("\n=== EXPERIMENT 1: Model Capacity ===")
-    cap_dir = run_dir + "/capacity"
-
-    cap_small  = train_model_b(model_size="small",  log_dir=cap_dir+"/small")
-    log(f"small:  {cap_small}")
-
-    cap_medium = train_model_b(model_size="medium", log_dir=cap_dir+"/medium")
-    log(f"medium: {cap_medium}")
-
-    cap_large  = train_model_b(model_size="large",  log_dir=cap_dir+"/large")
-    log(f"large:  {cap_large}")
-
-    log("\n=== EXPERIMENT 2: Data Augmentation ===")
-    aug_dir = run_dir + "/augmentation"
-
-    aug_off = train_model_b(augment=False, model_size="medium", log_dir=aug_dir+"/no_augmentation")
-    log(f"no augmentation: {aug_off}")
-
-    aug_on  = train_model_b(augment=True,  model_size="medium", log_dir=aug_dir+"/with_augmentation")
-    log(f"with augmentation: {aug_on}")
-
-    log("\n=== EXPERIMENT 3: Training Budget ===")
-    bud_30  = train_model_b(subset_ratio=0.3, model_size="medium", log_dir=run_dir + "/budget/30_percent_budget")
-    log(f"30% budget: {bud_30}")
-
-    bud_100 = train_model_b(subset_ratio=1.0, model_size="medium", log_dir=run_dir + "/budget/full_budget")
-    log(f"100% budget: {bud_100}")
-
-    log("\n=== EXPERIMENT 4: Optimizer Comparison ===")
-    for opt in ["sgd", "adam", "rmsprop"]:
-        log(f"\n>>> Running optimizer = {opt}")
+    # ===== DIMENSION 2: CAPACITY COMPARISON =====
+    print("\n[Dimension 2] Model Capacity: Small, Medium, Large")
+    print("=" * 50)
+    
+    all_results["dim2_capacity"] = {}
+    
+    for size in ["small", "medium", "large"]:
+        print(f"\n  > Training {size.upper()} model...")
+        cap_dir = f"{run_dir}/dim2_{size}"
         result = train_model_b(
-            optimizer_name=opt,
-            model_size="medium",
-            epochs=20,
             augment=True,
+            model_size=size,
             subset_ratio=1.0,
-            log_dir=run_dir + f"/optimizer/{opt}"
+            log_dir=cap_dir
         )
-        log(f"{opt}: {result}")
+        report_results(result, f"Capacity: {size}")
+        all_results["dim2_capacity"][size] = result
 
-    log("\n=== ALL EXPERIMENTS DONE ===")
+    # ===== DIMENSION 3: TRAINING BUDGET COMPARISON =====
+    print("\n[Dimension 3] Training Budget: Different data ratios")
+    print("=" * 50)
+    
+    budget_ratios = [0.1, 0.3, 0.5, 1.0]
+    all_results["dim3_budgets"] = {}
+    
+    for ratio in budget_ratios:
+        print(f"\n  > Training with {ratio*100:.0f}% training data...")
+        budget_dir = f"{run_dir}/dim3_budget_{ratio}"
+        result = train_model_b(
+            augment=True,
+            model_size="medium",
+            subset_ratio=ratio,
+            log_dir=budget_dir
+        )
+        report_results(result, f"Budget {ratio*100:.0f}%")
+        all_results["dim3_budgets"][ratio] = result
 
-    log_file.close()
-    print(f"\nAll results have been saved to:\n{log_path}")
+    # ===== DIMENSION 4: OPTIMIZER COMPARISON =====
+    print("\n[Dimension 4] Optimizer: Adam, SGD, RMSprop")
+    print("=" * 50)
+    
+    all_results["dim4_optimizers"] = {}
+    
+    for opt in ["adam", "sgd", "rmsprop"]:
+        print(f"\n  > Training with {opt.upper()} optimizer...")
+        opt_dir = f"{run_dir}/dim4_{opt}"
+        result = train_model_b(
+            augment=True,
+            model_size="medium",
+            subset_ratio=1.0,
+            optimizer_name=opt,
+            log_dir=opt_dir
+        )
+        report_results(result, f"Optimizer: {opt}")
+        all_results["dim4_optimizers"][opt] = result
 
-def report_results(results_dict):
+    # ===== GENERATE FOUR DIMENSION COMPARISON PLOTS =====
+    print("\n[Generating 4 comparison plots...]")
+    plot_four_dimension_comparison(all_results, run_dir)
+
+    # Save summary
+    summary_path = f"{run_dir}/summary.txt"
+    with open(summary_path, "w") as f:
+        f.write("=== Model B Four-Dimensional Analysis ===\n\n")
+        for key, results in all_results.items():
+            f.write(f"\n{key}:\n")
+            f.write(str(results) + "\n")
+
+    print(f"\n>>> All results saved under: {run_dir}/\n")
+
+def report_results(results_dict, title="Model B Results"):
     """
     print a summary of results
     arguments:
         results_dict: dictionary of results
+        title: title for the report
     returns:
         None
     """
-    print("\n================= MODEL B SUMMARY =================")
+    print(f"\n================= {title} =================")
     for metric, value in results_dict.items():
-        print(f"{metric.capitalize()}: {value:.4f}")
-    print("====================================================\n")
+        print(f"  {metric.capitalize()}: {value:.4f}")
+    print("=" * 50 + "\n")

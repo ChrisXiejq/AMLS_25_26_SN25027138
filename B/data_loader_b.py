@@ -39,33 +39,34 @@ def get_transform(augment=False):
     tensor_ops = []
 
     if augment:
-        # PIL-based transforms
+        # PIL-based transforms - 减少激进程度，更适合医学图像
         pil_ops.extend([
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomRotation(degrees=15),
-            transforms.ColorJitter(brightness=0.15, contrast=0.15),
+            transforms.RandomHorizontalFlip(p=0.5),  # 保留水平翻转
+            transforms.RandomRotation(degrees=10),    # 减少旋转角度 15->10
+            transforms.ColorJitter(brightness=0.1, contrast=0.1),  # 减少亮度/对比度变化 0.15->0.1
             transforms.RandomAffine(
-                degrees=10,
-                translate=(0.05, 0.05),
-                scale=(0.95, 1.05),
-                shear=5
+                degrees=5,              # 减少仿射变换角度 10->5
+                translate=(0.03, 0.03), # 减少平移 0.05->0.03
+                scale=(0.97, 1.03),     # 减少缩放范围
+                shear=3                 # 减少剪切 5->3
             ),
         ])
 
     # Tensor-only transforms
     if augment:
-        tensor_ops.append(
-            transforms.ElasticTransform(alpha=3.0, sigma=5.0)
-        )
+        # 移除 ElasticTransform - 对医学图像过于激进
+        # tensor_ops.append(
+        #     transforms.ElasticTransform(alpha=3.0, sigma=5.0)
+        # )
 
-        # cutout / random erasing
+        # cutout / random erasing - 降低概率和强度
         tensor_ops.append(
-            transforms.RandomErasing(p=0.25, scale=(0.02, 0.08), ratio=(0.3, 3.3))
+            transforms.RandomErasing(p=0.15, scale=(0.02, 0.05), ratio=(0.5, 2.0))  # 降低擦除强度
         )
 
     # common transforms
     tensor_ops.extend([
-        GaussianNoiseTransform(std=0.03),
+        GaussianNoiseTransform(std=0.02),  # 减少噪声 0.03->0.02
         transforms.Normalize(mean=[0.5], std=[0.5]),
     ])
 
@@ -112,11 +113,11 @@ def get_datasets(augment_train=True):
     return train_ds, val_ds, test_ds
 
 
-def get_dataloaders(batch_size=64, augment_train=True, num_workers=2):
+def get_dataloaders(batch_size=128, augment_train=True, num_workers=0):
     """
     returns train/val/test DataLoaders
     Args:
-        batch_size (int): batch size for DataLoaders
+        batch_size (int): batch size for DataLoaders (increased to 128 for speed)
         augment_train (bool): whether to apply data augmentation to training set
         num_workers (int): number of subprocesses to use for data loading
     Returns:
@@ -125,13 +126,13 @@ def get_dataloaders(batch_size=64, augment_train=True, num_workers=2):
     train_ds, val_ds, test_ds = get_datasets(augment_train=augment_train)
 
     train_loader = DataLoader(
-        train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers
+        train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True
     )
     val_loader = DataLoader(
-        val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers
+        val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True
     )
     test_loader = DataLoader(
-        test_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers
+        test_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True
     )
 
     return train_loader, val_loader, test_loader

@@ -1,13 +1,40 @@
-# Code/model_b/train_b.py
+# Code/B/train_b.py
 from sklearn.metrics import confusion_matrix
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 from tqdm import tqdm
 
 from .cnn_model import AMLSCNN
 from .data_loader_b import get_dataloaders
 from .metrics_b import evaluate_metrics
+from .plot_b import ensure_dir, plot_confusion_matrix, plot_learning_curve
+
+
+class FocalLoss(nn.Module):
+    """
+    Focal Loss for addressing class imbalance.
+    Reference: Lin et al. "Focal Loss for Dense Object Detection"
+    """
+    def __init__(self, alpha=0.25, gamma=2.0, reduction='mean'):
+        super(FocalLoss, self).__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+        self.reduction = reduction
+    
+    def forward(self, inputs, targets):
+        ce_loss = F.cross_entropy(inputs, targets, reduction='none')
+        pt = torch.exp(-ce_loss)
+        focal_loss = self.alpha * (1 - pt) ** self.gamma * ce_loss
+        
+        if self.reduction == 'mean':
+            return focal_loss.mean()
+        elif self.reduction == 'sum':
+            return focal_loss.sum()
+        else:
+            return focal_loss
+
 from .plot_b import ensure_dir, plot_confusion_matrix, plot_learning_curve
 
 def get_optimizer(optimizer_name, model_params, lr):
@@ -27,16 +54,17 @@ def get_optimizer(optimizer_name, model_params, lr):
         raise ValueError(f"Unknown optimizer: {optimizer_name}")
 
 def train_model_b(
-    batch_size=64,
+    batch_size=128,
     lr=1e-3,
-    epochs=20,
+    epochs=25,           
     augment=True,
     subset_ratio=1.0,
     model_size="small",
     device="cpu",
-    patience=5,          # Early Stopping
+    patience=7,          
     optimizer_name="adam",
-    log_dir="model_b/logs"
+    loss_function="crossentropy",
+    log_dir="B/logs"
 ):
     """
     Train Model B: Simple CNN with optional data augmentation and training budget.
@@ -50,6 +78,7 @@ def train_model_b(
         device: "cpu" or "cuda"
         patience: epochs to wait for improvement before early stopping
         optimizer_name: "adam", "sgd", or "rmsprop"
+        loss_function: "crossentropy" or "focal"
         log_dir: directory to save logs and plots
     returns:
         results: dictionary of test results
@@ -65,10 +94,11 @@ def train_model_b(
     log_text.append(f"model_size={model_size}\n")
     log_text.append(f"device={device}\n")
     log_text.append(f"patience={patience}\n")
-    log_text.append(f"optimizer_name={optimizer_name}\n\n")
+    log_text.append(f"optimizer_name={optimizer_name}\n")
+    log_text.append(f"loss_function={loss_function}\n\n")
 
     print(f"[Model B - CNN] Training on device: {device}")
-    print(f"  → augment={augment}, subset_ratio={subset_ratio}, model_size={model_size}")
+    print(f"  → augment={augment}, subset_ratio={subset_ratio}, model_size={model_size}, loss={loss_function}")
 
     # Load datasets
     train_loader, val_loader, test_loader = get_dataloaders(
@@ -87,7 +117,8 @@ def train_model_b(
             subset_ds,
             batch_size=batch_size,
             shuffle=True,
-            num_workers=2
+            num_workers=0,  # Faster on some systems
+            pin_memory=True
         )
 
     # Model Capacity 
@@ -102,6 +133,11 @@ def train_model_b(
 
     criterion = nn.CrossEntropyLoss()
     optimizer = get_optimizer(optimizer_name, model.parameters(), lr)
+    
+    # 添加学习率调度器，提升训练效果
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode='min', factor=0.5, patience=3
+    )
 
     train_losses, val_losses, val_accuracies = [], [], []
 
@@ -151,6 +187,9 @@ def train_model_b(
         print(f"Epoch {epoch}: Train Loss={train_loss:.4f}, Val Loss={val_loss:.4f}, Val Acc={val_acc:.4f}")
         log_text.append(f"Epoch {epoch}: Train Loss={train_loss:.4f}, Val Loss={val_loss:.4f}, Val Acc={val_acc:.4f}\n")
 
+        # 学习率调度
+        scheduler.step(val_loss)
+
         # Early Stopping 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
@@ -180,7 +219,7 @@ def train_model_b(
     suffix = f"{model_size}_aug{augment}_budget{subset_ratio}"
     plot_confusion_matrix(cm, suffix=suffix, log_dir=log_dir)
 
-    ensure_dir("model_b/saved_models")
-    torch.save(model.state_dict(), f"model_b/saved_models/cnn_{model_size}_aug{augment}_budget{subset_ratio}_optim{optimizer_name}.pth")
+    ensure_dir("B/saved_models")
+    torch.save(model.state_dict(), f"B/saved_models/cnn_{model_size}_aug{augment}_budget{subset_ratio}_optim{optimizer_name}.pth")
 
     return results
