@@ -1,0 +1,26 @@
+===== Experiment Log =====
+processed=False
+pca_dim=50
+capacity_list=[0.1, 1, 10]
+subset_ratio=1.0
+augment=True
+
+Applied augmentation.
+
+===== Training Incremental SVM (C=0.1) =====
+
+===== Training Incremental SVM (C=1) =====
+
+===== Training Incremental SVM (C=10) =====
+
+===== Training SVM (C=0.1) =====
+[Val ] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+[Test] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+
+===== Training SVM (C=1) =====
+[Val ] {'accuracy': 0.8205128205128205, 'precision': 0.8028169014084507, 'recall': 1.0, 'f1': 0.890625}
+[Test] {'accuracy': 0.8012820512820513, 'precision': 0.7943262411347518, 'recall': 0.9824561403508771, 'f1': 0.8784313725490196}
+
+===== Training SVM (C=10) =====
+[Val ] {'accuracy': 0.8205128205128205, 'precision': 0.8524590163934426, 'recall': 0.9122807017543859, 'f1': 0.8813559322033898}
+[Test] {'accuracy': 0.8012820512820513, 'precision': 0.832, 'recall': 0.9122807017543859, 'f1': 0.8702928870292888}

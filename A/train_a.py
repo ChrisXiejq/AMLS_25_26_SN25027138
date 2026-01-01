@@ -22,10 +22,10 @@ def build_model(capacity=1.0):
 def train_model_a(
     processed=False,
     pca_dim=50,
-    capacity_list=[0.1, 1, 10],
+    capacity_list=[0.001, 0.01, 0.1, 1, 10, 100, 1000],
     subset_ratio=1.0,
     augment=True,    
-    log_dir="model_a/logs"
+    log_dir="A/logs"
 ):
     """
     Train Model A: SVM with optional PCA and HOG feature augmentation.
@@ -78,6 +78,16 @@ def train_model_a(
 
     model_a_dir = os.path.dirname(os.path.abspath(__file__))
 
+    # Train multiple capacities
+    for C in capacity_list:
+        model_path = os.path.join(
+            model_a_dir,
+            "saved_models",
+            f"modelA_C{C}_processed{processed}_augment{augment}_budget{subset_ratio}.pkl"
+        )
+        ensure_dir(os.path.dirname(model_path))
+        log_text.append(f"\n===== Training Incremental SVM (C={C}) =====\n")
+        
     # Train multiple capacities
     for C in capacity_list:
         model_path = os.path.join(

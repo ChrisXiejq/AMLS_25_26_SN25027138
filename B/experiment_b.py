@@ -14,7 +14,7 @@ def run_model_b_experiments():
 
     # Create a unique RUN directory
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_dir = f"model_b/logs/run_{timestamp}"
+    run_dir = f"B/logs/run_{timestamp}"
 
     # Create a TXT file for logging
     os.makedirs(run_dir, exist_ok=True)

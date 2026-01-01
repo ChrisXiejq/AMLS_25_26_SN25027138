@@ -1,0 +1,50 @@
+===== Experiment Log =====
+processed=True
+pca_dim=50
+capacity_list=[0.001, 0.01, 0.1, 1, 10, 100, 1000]
+subset_ratio=1.0
+augment=True
+
+Applied augmentation.
+
+===== Training Incremental SVM (C=0.001) =====
+
+===== Training Incremental SVM (C=0.01) =====
+
+===== Training Incremental SVM (C=0.1) =====
+
+===== Training Incremental SVM (C=1) =====
+
+===== Training Incremental SVM (C=10) =====
+
+===== Training Incremental SVM (C=100) =====
+
+===== Training Incremental SVM (C=1000) =====
+
+===== Training SVM (C=0.001) =====
+[Val ] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+[Test] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+
+===== Training SVM (C=0.01) =====
+[Val ] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+[Test] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+
+===== Training SVM (C=0.1) =====
+[Val ] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+[Test] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+
+===== Training SVM (C=1) =====
+[Val ] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444}
+[Test] {'accuracy': 0.7307692307692307, 'precision': 0.7337662337662337, 'recall': 0.9912280701754386, 'f1': 0.8432835820895522}
+
+===== Training SVM (C=10) =====
+[Val ] {'accuracy': 0.7435897435897436, 'precision': 0.7402597402597403, 'recall': 1.0, 'f1': 0.8507462686567164}
+[Test] {'accuracy': 0.7051282051282052, 'precision': 0.7328767123287672, 'recall': 0.9385964912280702, 'f1': 0.823076923076923}
+
+===== Training SVM (C=100) =====
+[Val ] {'accuracy': 0.782051282051282, 'precision': 0.7777777777777778, 'recall': 0.9824561403508771, 'f1': 0.8682170542635659}
+[Test] {'accuracy': 0.7435897435897436, 'precision': 0.75, 'recall': 0.9736842105263158, 'f1': 0.8473282442748091}
+
+===== Training SVM (C=1000) =====
+[Val ] {'accuracy': 0.782051282051282, 'precision': 0.7777777777777778, 'recall': 0.9824561403508771, 'f1': 0.8682170542635659}
+[Test] {'accuracy': 0.7435897435897436, 'precision': 0.75, 'recall': 0.9736842105263158, 'f1': 0.8473282442748091}

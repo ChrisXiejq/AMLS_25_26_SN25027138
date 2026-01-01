@@ -1,0 +1,15 @@
+===== Experiment Log =====
+processed=True
+pca_dim=50
+capacity_list=[100]
+subset_ratio=0.1
+augment=True
+
+Applied augmentation.
+Training budget used = 54
+
+===== Training Incremental SVM (C=100) =====
+
+===== Training SVM (C=100) =====
+[Val ] {'accuracy': 0.717948717948718, 'precision': 0.7272727272727273, 'recall': 0.9824561403508771, 'f1': 0.835820895522388}
+[Test] {'accuracy': 0.7435897435897436, 'precision': 0.743421052631579, 'recall': 0.9912280701754386, 'f1': 0.849624060150376}
