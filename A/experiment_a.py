@@ -78,7 +78,7 @@ def run_model_a_experiments():
     print("\n[Dimension 3] Model Capacity: Different C values (Processed+Aug)")
     print("=" * 50)
     print("  > Already trained in Dimension 2")
-    all_results["dim3_capacity"] = results_processed_aug
+    all_results["dim3_capacity"] = results_processed
 
     # DIMENSION 4: TRAINING BUDGET COMPARISON
     print("\n[Dimension 4] Training Budget: Different data ratios (Processed+Aug, C={})".format(best_C))
@@ -113,6 +113,36 @@ def run_model_a_experiments():
             f.write(str(results) + "\n")
 
     print(f"\n>>> All results saved under: {run_dir}/\n")
+
+
+def run_model_a_processed_only():
+    """Run only the processed (HOG+PCA) configuration without augmentation.
+    This is a lightweight entry point to rerun Dimension 1 processed setting
+    without executing augmentation/budget experiments.
+    """
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = f"A/logs/run_{timestamp}_processed_only"
+    print(f"\n========= MODEL A (Processed, No Aug) : {run_dir} =========\n")
+
+    # Processed features (no augmentation)
+    processed_dir = f"{run_dir}/processed_no_aug"
+    results_processed = train_model_a(
+        processed=True,
+        augment=False,
+        subset_ratio=1.0,
+        log_dir=processed_dir
+    )
+
+    report_results(results_processed, title="PROCESSED Features (HOG+PCA, No Aug)")
+
+    # Save summary
+    summary_path = f"{run_dir}/summary.txt"
+    with open(summary_path, "w") as f:
+        f.write("=== Model A Processed (No Aug) ===\n\n")
+        f.write(str(results_processed) + "\n")
+
+    print(f"\n>>> Processed-only results saved under: {run_dir}/\n")
 
 
 def report_results(results_dict, title="Model A Results"):
