@@ -13,6 +13,11 @@ Binary breast tumor classification on BreastMNIST with two models:
 * If missing, enable `prepare_breastmnist_dataset()` in `main.py` to download via MedMNIST
 
 ## How to run
+* First ensure environment:
+    ```bash
+    conda env create -f environment.yml
+    conda activate amls-final
+    ```
 * Default entrypoint runs both models:
 	```bash
 	python main.py

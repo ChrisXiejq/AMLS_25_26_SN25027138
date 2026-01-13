@@ -56,9 +56,9 @@ def get_optimizer(optimizer_name, model_params, lr):
         raise ValueError(f"Unknown optimizer: {optimizer_name}")
 
 def train_model_b(
-    batch_size=128,
+    batch_size=64,
     lr=1e-3,
-    epochs=25,           
+    epochs=40,           
     augment=True,
     subset_ratio=1.0,
     model_size="small",

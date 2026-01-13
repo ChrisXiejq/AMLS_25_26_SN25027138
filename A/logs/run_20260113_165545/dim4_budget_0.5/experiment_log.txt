@@ -1,0 +1,51 @@
+===== Experiment Log =====
+processed=True
+pca_dim=50
+capacity_list=[0.001, 0.01, 0.1, 1, 10, 100, 1000]
+subset_ratio=0.5
+augment=True
+
+Applied augmentation.
+Training budget used = 273
+
+===== Training Incremental SVM (C=0.001) =====
+
+===== Training Incremental SVM (C=0.01) =====
+
+===== Training Incremental SVM (C=0.1) =====
+
+===== Training Incremental SVM (C=1) =====
+
+===== Training Incremental SVM (C=10) =====
+
+===== Training Incremental SVM (C=100) =====
+
+===== Training Incremental SVM (C=1000) =====
+
+===== Training SVM (C=0.001) =====
+[Val ] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444, 'roc_auc': 0.431077694235589}
+[Test] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444, 'roc_auc': 0.5522138680033417}
+
+===== Training SVM (C=0.01) =====
+[Val ] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444, 'roc_auc': 0.4979114452798663}
+[Test] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444, 'roc_auc': 0.4801587301587302}
+
+===== Training SVM (C=0.1) =====
+[Val ] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444, 'roc_auc': 0.7034252297410192}
+[Test] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444, 'roc_auc': 0.5574352548036758}
+
+===== Training SVM (C=1) =====
+[Val ] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444, 'roc_auc': 0.4995822890559733}
+[Test] {'accuracy': 0.7307692307692307, 'precision': 0.7307692307692307, 'recall': 1.0, 'f1': 0.8444444444444444, 'roc_auc': 0.4839181286549708}
+
+===== Training SVM (C=10) =====
+[Val ] {'accuracy': 0.6794871794871795, 'precision': 0.7222222222222222, 'recall': 0.9122807017543859, 'f1': 0.8062015503875969, 'roc_auc': 0.4227234753550543}
+[Test] {'accuracy': 0.6923076923076923, 'precision': 0.7291666666666666, 'recall': 0.9210526315789473, 'f1': 0.813953488372093, 'roc_auc': 0.4945697577276525}
+
+===== Training SVM (C=100) =====
+[Val ] {'accuracy': 0.6794871794871795, 'precision': 0.7222222222222222, 'recall': 0.9122807017543859, 'f1': 0.8062015503875969, 'roc_auc': 0.35004177109440265}
+[Test] {'accuracy': 0.6730769230769231, 'precision': 0.7142857142857143, 'recall': 0.9210526315789473, 'f1': 0.8045977011494253, 'roc_auc': 0.4730576441102757}
+
+===== Training SVM (C=1000) =====
+[Val ] {'accuracy': 0.6794871794871795, 'precision': 0.7222222222222222, 'recall': 0.9122807017543859, 'f1': 0.8062015503875969, 'roc_auc': 0.4227234753550543}
+[Test] {'accuracy': 0.6923076923076923, 'precision': 0.7291666666666666, 'recall': 0.9210526315789473, 'f1': 0.813953488372093, 'roc_auc': 0.4945697577276525}
