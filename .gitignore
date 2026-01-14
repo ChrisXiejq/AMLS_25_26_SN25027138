@@ -21,7 +21,7 @@ outputs/
 
 # === Datasets ===
 Datasets/
-Datasets/.gitkeep
+!Datasets/.gitkeep
 
 # === IDE / OS junk ===
 .DS_Store
