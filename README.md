@@ -5,19 +5,21 @@ Binary breast tumor classification on BreastMNIST with two models:
 * **Model B (CNN)**: 3-block CNN with BatchNorm/Dropout, augmentation ablations
 
 ## Environment
-* Python 3.10
-* Create the env: `conda env create -f environment.yml` then `conda activate amls-final`
+> **Prerequisites**: This project requires **Conda** to be installed on your system.
+> * If you don't have Conda installed, download from: https://docs.conda.io/en/latest/miniconda.html
+
+**Setup instructions:**
+```bash
+conda env create -f environment.yml
+conda activate amls-final
+```
 
 ## Data
 * Dataset path: `Datasets/BreastMNIST/breastmnist.npz`
-* If missing, enable `prepare_breastmnist_dataset()` in `main.py` to download via MedMNIST
 
 ## How to run
-* First ensure environment:
-    ```bash
-    conda env create -f environment.yml
-    conda activate amls-final
-    ```
+* Ensure environment is activated (see Environment section above)
+* Dataset will auto-download on first run if missing
 * Default entrypoint runs both models:
 	```bash
 	python main.py

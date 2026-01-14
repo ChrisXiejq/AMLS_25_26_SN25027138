@@ -7,7 +7,9 @@ channels:
 dependencies:
   - python=3.10
   - numpy
+  - scipy
   - scikit-learn
+  - scikit-image
   - matplotlib
   - pillow
   - tqdm

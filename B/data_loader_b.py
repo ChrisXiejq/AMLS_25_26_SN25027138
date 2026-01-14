@@ -8,6 +8,10 @@ from torchvision import transforms
 from medmnist import BreastMNIST
 
 def target_to_int(y):
+    """Convert target to integer, handling both scalar and array inputs."""
+    if hasattr(y, '__iter__') and not isinstance(y, str):
+        # If it's an array-like object, get the first element
+        return int(y[0])
     return int(y)
 
 def get_dataset_root():
