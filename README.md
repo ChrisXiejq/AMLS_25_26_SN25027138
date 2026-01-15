@@ -10,6 +10,7 @@ Binary breast tumor classification on BreastMNIST with two models:
 
 **Setup instructions:**
 ```bash
+cd AMLS_25_26_SN25027138
 conda env create -f environment.yml
 conda activate amls-final
 ```
