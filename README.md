@@ -25,7 +25,7 @@ conda activate amls-final
 	```bash
 	python main.py
 	```
-	(inside `main.py`, comment/uncomment to choose: `run_model_a_experiments()`, `run_model_a_processed_only()`, `run_model_b_experiments()`)
+	(inside `main.py`, comment/uncomment to choose: `run_model_a_experiments()`, `run_model_b_experiments()`)
 
 ## Outputs
 * Logs and figures:
